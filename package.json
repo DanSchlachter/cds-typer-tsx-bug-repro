@@ -1,0 +1,40 @@
+{
+  "name": "cds-typer-tsx-bug-repro",
+  "version": "1.0.0",
+  "description": "Minimal reproduction: cds-typer .js files cause circular dependency error under tsx when @cap-js/attachments is used",
+  "private": true,
+  "dependencies": {
+    "@cap-js/attachments": "^3",
+    "@sap/cds": "^9",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/cds-typer": "^0.38.0",
+    "@cap-js/cds-types": "^0.16.0",
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": "^9",
+    "tsx": "^4",
+    "typescript": "^5"
+  },
+  "scripts": {
+    "dev": "cds-tsx watch",
+    "dev:workaround": "find @cds-models -name '*.js' -delete 2>/dev/null; cds-tsx watch"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": "db.sqlite"
+        }
+      },
+      "attachments": {
+        "kind": "db"
+      }
+    },
+    "typer": {
+      "outputDirectory": "@cds-models",
+      "useEntitiesProxy": true
+    }
+  }
+}
