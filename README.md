@@ -28,15 +28,22 @@ npm run dev
 
 The server crashes immediately after model loading with `TypeError: Class extends value undefined is not a constructor or null`.
 
-## Workaround
+## Fix
 
-Delete all `.js` files from `@cds-models/` before starting the server:
+Use the shorter path mapping in `tsconfig.json` (per [cap-js/cds-typer#381](https://github.com/cap-js/cds-typer/issues/381)):
+
+```diff
+- "#cds-models/*": ["./@cds-models/*/index.ts"]
++ "#cds-models/*": ["./@cds-models/*"]
+```
+
+Then run `npm run dev` again — the server starts correctly.
+
+Alternatively, deleting all `.js` files from `@cds-models/` also works:
 
 ```bash
 npm run dev:workaround
 ```
-
-This runs `find @cds-models -name '*.js' -delete` before `cds-tsx watch`.
 
 ## Root Cause
 
@@ -51,6 +58,8 @@ The `@cap-js/attachments` plugin introduces a **circular import chain** in the g
 5. `__.Entity` is `undefined` → `class cuid extends _cuidAspect(__.Entity)` fails
 
 **Without `@cap-js/attachments`**, there is no `sap/attachments` directory and no circular import, so the bug does not manifest.
+
+The explicit `*/index.ts` path mapping forces tsx to resolve the exact file, hitting the `.js` shadow during circular resolution. The shorter `*` path lets tsx resolve the module more flexibly, avoiding the `.js` file.
 
 ### Why the `.js` file doesn't have `Entity`
 
